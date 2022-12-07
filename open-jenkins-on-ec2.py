@@ -2,8 +2,7 @@ import json
 import os
 import subprocess
 import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import webbrowser
 
 from dotenv import load_dotenv, find_dotenv
 
@@ -52,26 +51,10 @@ def authorizeSecurityGroupIngress(new_ip):
 def changeIpInSecurityGroup(new_ip):
     revokeSecurityGroupIngress()
     authorizeSecurityGroupIngress(new_ip)
-
-def configureWebDriver():
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True)
-    return webdriver.Chrome(options=options)
     
 def openJenkinsInBrowser(jenkins_url):
-    driver = configureWebDriver()
+    webbrowser.open_new_tab(jenkins_url)
     
-    driver.get(f'{jenkins_url}')
-
-    username_html_field = driver.find_element(By.NAME, "j_username")
-    username_html_field.send_keys(JENKINS_USERNAME)
-
-    password_html_field = driver.find_element(By.NAME,"j_password")
-    password_html_field.send_keys(JENKINS_PASSWORD)
-
-    driver.find_element(By.NAME,"Submit").click()
-    
-
 def getPublicIpv4DNS():
     aws_return = os.popen(f'aws ec2 describe-instance-status --region {REGION} --profile {PROFILE} --instance-ids {INSTANCE_ID}').read()
     ec2_instance_status = json.loads(aws_return)
