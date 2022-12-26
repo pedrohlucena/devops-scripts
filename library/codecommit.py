@@ -24,9 +24,12 @@ class CodeCommit:
         return json.loads(os.popen(command).read())
 
     def get_repository_tenant_by_its_tags(self, repository):
-        arn = self.get_repository_arn(repository)
-        repository_tags = self.list_tags_for_resource(arn)
-        return repository_tags['tags']['tenant']
+        try:
+            arn = self.get_repository_arn(repository)
+            repository_tags = self.list_tags_for_resource(arn)
+            return repository_tags['tags']['tenant']
+        except KeyError as e:
+            print(e)
     
     def close_pull_request(self, pr_id):
         command = f'{self.command} update-pull-request-status --pull-request-id {pr_id} --pull-request-status CLOSED'
